@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include das_gdrive *.css
+recursive-include das_gdrive *.csv
+recursive-include das_gdrive *.html
+recursive-include das_gdrive *.ico
+recursive-include das_gdrive *.js
+recursive-include das_gdrive *.json
+recursive-include das_gdrive *.md
+recursive-include das_gdrive *.png
+recursive-include das_gdrive *.py
+recursive-include das_gdrive *.svg
+recursive-include das_gdrive *.txt
+recursive-exclude das_gdrive *.pyc
