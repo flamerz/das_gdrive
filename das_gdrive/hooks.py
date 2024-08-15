@@ -132,9 +132,10 @@ app_license = "MIT"
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
+override_whitelisted_methods = {
+    "frappe.integrations.doctype.google_drive.google_drive.take_backup": "das_gdrive.custom.gdrive.take_backup"
 # 	"frappe.desk.doctype.event.event.get_events": "das_gdrive.event.get_events"
-# }
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
