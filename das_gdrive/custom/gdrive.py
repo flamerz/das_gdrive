@@ -16,7 +16,7 @@ from frappe.model.document import Document
 from frappe.utils import get_backups_path, get_bench_path
 from frappe.utils.background_jobs import enqueue
 from frappe.utils.backups import new_backup
-
+from frappe.integrations.doctype.google_drive.google_drive import get_google_drive_object, check_for_folder_in_google_drive, set_progress, get_absolute_path
 @frappe.whitelist()
 def take_backup():
 	"""Enqueue longjob for taking backup to Google Drive"""
