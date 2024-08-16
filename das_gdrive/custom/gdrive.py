@@ -1,25 +1,21 @@
 import os
 from urllib.parse import quote
 
-import google.oauth2.credentials
-import requests
 from apiclient.http import MediaFileUpload
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import frappe
 from frappe import _
-from frappe.integrations.doctype.google_settings.google_settings import get_auth_url
+from frappe.integrations.google_oauth import GoogleOAuth
 from frappe.integrations.offsite_backup_utils import (
 	get_latest_backup_file,
 	send_email,
 	validate_file_size,
 )
 from frappe.model.document import Document
-from frappe.utils import get_backups_path, get_bench_path, get_request_site_address
+from frappe.utils import get_backups_path, get_bench_path
 from frappe.utils.background_jobs import enqueue
 from frappe.utils.backups import new_backup
-from frappe.integrations.doctype.google_drive.google_drive import get_google_drive_object, check_for_folder_in_google_drive, set_progress, get_absolute_path
 
 @frappe.whitelist()
 def take_backup():
@@ -30,6 +26,7 @@ def take_backup():
 		timeout=1500,
 	)
 	frappe.msgprint(_("Queued for backup. It may take a few minutes to an hour."))
+
 
 def upload_system_backup_to_google_drive():
 	"""
@@ -61,13 +58,13 @@ def upload_system_backup_to_google_drive():
 		if not fileurl:
 			continue
 
-		file_metadata = {"name": fileurl, "parents": [account.backup_folder_id]}
+		file_metadata = {"name": os.path.basename(fileurl), "parents": [account.backup_folder_id]}
 
 		try:
 			media = MediaFileUpload(
 				get_absolute_path(filename=fileurl), mimetype="application/gzip", resumable=True
 			)
-		except IOError as e:
+		except OSError as e:
 			frappe.throw(_("Google Drive - Could not locate - {0}").format(e))
 
 		try:
@@ -77,6 +74,6 @@ def upload_system_backup_to_google_drive():
 			send_email(False, "Google Drive", "Google Drive", "email", error_status=e)
 
 	set_progress(3, "Uploading successful.")
-	frappe.db.set_value("Google Drive", None, "last_backup_on", frappe.utils.now_datetime())
+	frappe.db.set_single_value("Google Drive", "last_backup_on", frappe.utils.now_datetime())
 	send_email(True, "Google Drive", "Google Drive", "email")
 	return _("Google Drive Backup Successful.")
